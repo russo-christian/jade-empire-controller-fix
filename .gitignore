@@ -1,0 +1,6 @@
+# Build output
+/build/
+
+# Local editor settings
+/.vs/
+/.vscode/
