@@ -39,7 +39,7 @@ Development chronology belongs in version control rather than source comments.
 - `tests/control_math.cpp`: movement directions, speed and invalid inputs.
 - `tests/controller_bindings.cpp`: first-use defaults, persisted remaps, profile isolation, invalid entries and failed writes using a temporary INI.
 - `tests/glyph_assets.cpp`: synthetic texture decoding and archive-path validation.
-- `tests/proxy_forwarding.cpp`: forwarding to the system DirectInput library.
+- `tests/proxy_forwarding.cpp`: forwarding to the system DirectInput library, including a missing `GetdfDIJoystick` export as on Wine.
 
 These checks use generated inputs and the Windows DirectInput library.
 The script also checks each runtime header in isolation before compiling the DLL.
@@ -62,6 +62,9 @@ until process exit.
 
 The DLL exports only the six DirectInput functions listed in `src/dinput8.def`.
 Hook installation is an internal function called once by the proxy.
+The system DLL's `GetdfDIJoystick` export is optional; when absent, the proxy
+returns the Windows SDK's standard joystick format. The SDK format is linked
+as static data, without importing another `dinput8.dll`.
 
 Prompt IDs and `{n}` placeholders refer to native text entries and controller
 actions. Keep placeholders binding-aware. Leave unrelated dialogue and unsupported

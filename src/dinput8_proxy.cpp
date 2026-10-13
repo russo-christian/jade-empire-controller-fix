@@ -1,7 +1,9 @@
 #include "xbox_controls.hpp"
 
+#define DIRECTINPUT_VERSION 0x0800
 #include <cstdint>
 #include <cwchar>
+#include <dinput.h>
 #include <intrin.h>
 
 // Drop-in DirectInput 8 proxy. Initialization happens on an exported call,
@@ -28,15 +30,17 @@ static BOOL CALLBACK load_directinput(PINIT_ONCE, void*, void**) {
         directinput_error = GetLastError();
         return TRUE;
     }
-    const char* names[]{"DirectInput8Create", "DllCanUnloadNow",     "DllGetClassObject",
-                        "DllRegisterServer",  "DllUnregisterServer", "GetdfDIJoystick"};
-    for (unsigned i = 0; i < 6; ++i) {
+    const char* names[]{"DirectInput8Create", "DllCanUnloadNow", "DllGetClassObject",
+                        "DllRegisterServer", "DllUnregisterServer"};
+    for (unsigned i = 0; i < 5; ++i) {
         directinput_exports[i] = GetProcAddress(module, names[i]);
         if (!directinput_exports[i]) {
             directinput_error = ERROR_PROC_NOT_FOUND;
             return TRUE;
         }
     }
+    // Wine omits this optional export. Its absence must not disable DirectInput.
+    directinput_exports[5] = GetProcAddress(module, "GetdfDIJoystick");
     directinput_error = ERROR_SUCCESS;
     return TRUE;
 }
@@ -98,5 +102,7 @@ extern "C" HRESULT WINAPI ProxyDllUnregisterServer() {
 extern "C" const void* WINAPI ProxyGetdfDIJoystick() {
     if (!directinput_ready())
         return nullptr;
-    return reinterpret_cast<const void*(WINAPI*)()>(directinput_exports[5])();
+    if (directinput_exports[5])
+        return reinterpret_cast<const void*(WINAPI*)()>(directinput_exports[5])();
+    return &c_dfDIJoystick;
 }

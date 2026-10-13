@@ -44,7 +44,8 @@ foreach ($jadeSource in Get-ChildItem -LiteralPath (Join-Path $jadeRoot 'src') -
     $jadeObjects += $jadeObject
 }
 # Export ordinals deliberately match Windows dinput8; suppress only that advisory.
-& $jadeCompiler /nologo /LD @jadeObjects "/Fe:$jadeOutput\dinput8.dll" @jadeLinkFlags "/DEF:$jadeRoot\src\dinput8.def" /IGNORE:4222
+# The SDK library supplies the fallback joystick format as static data.
+& $jadeCompiler /nologo /LD @jadeObjects "/Fe:$jadeOutput\dinput8.dll" @jadeLinkFlags 'dxguid.lib' "$jadeSdk\Lib\$jadeSdkVersion\um\x86\dinput8.lib" "/DEF:$jadeRoot\src\dinput8.def" /IGNORE:4222
 if ($LASTEXITCODE -ne 0) { throw 'DirectInput proxy link failed.' }
 
 function Build-Test([string]$Name, [string]$Source, [string[]]$Objects = @(), [string[]]$LinkOptions = @()) {
@@ -60,9 +61,11 @@ if ($LASTEXITCODE -ne 0) { throw 'Controller binding setup checks failed.' }
 Build-Test 'glyph_assets' 'glyph_assets.cpp' @((Join-Path $jadeObjectDirectory 'glyph_assets.obj'))
 & (Join-Path $jadeOutput 'test_glyph_assets.exe')
 if ($LASTEXITCODE -ne 0) { throw 'Glyph decoder checks failed.' }
-Build-Test 'proxy_forwarding' 'proxy_forwarding.cpp' -LinkOptions @('dxguid.lib')
+Build-Test 'proxy_forwarding' 'proxy_forwarding.cpp' -LinkOptions @('dxguid.lib', "$jadeSdk\Lib\$jadeSdkVersion\um\x86\dinput8.lib")
 & (Join-Path $jadeOutput 'test_proxy_forwarding.exe') (Join-Path $jadeOutput 'dinput8.dll')
 if ($LASTEXITCODE -ne 0) { throw 'Proxy forwarding checks failed.' }
+& (Join-Path $jadeOutput 'test_proxy_forwarding.exe') (Join-Path $jadeOutput 'dinput8.dll') --without-joystick-export
+if ($LASTEXITCODE -ne 0) { throw 'Proxy missing-export checks failed.' }
 
 # A rebuild must not overwrite locally chosen options.
 $jadeIni = Join-Path $jadeOutput 'JadeEmpireControllerFix.ini'
