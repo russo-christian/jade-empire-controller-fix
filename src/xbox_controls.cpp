@@ -110,7 +110,12 @@ static void __fastcall orbit_input(void* behaviour, void*, float horizontal, flo
     if (changed || !std::isfinite(field<float>(behaviour, 0xc0)) ||
         !std::isfinite(field<float>(behaviour, 0xa0)) ||
         !std::isfinite(field<float>(behaviour, 0xc4))) {
-        Vec3 forward = camera_forward(field<Quaternion>(camera, 0x88));
+        // The behaviour stores a camera interface, which can point inside the
+        // object. Its virtual getter adjusts the pointer before reading rotation.
+        Quaternion rotation{};
+        using Rotation = Quaternion*(__thiscall*)(void*, Quaternion*);
+        method<Rotation>(camera, 0xb0)(camera, &rotation);
+        Vec3 forward = camera_forward(rotation);
         float planar = std::hypot(forward.x, forward.y);
         // A transition may leave a vertical or not-yet-oriented camera. Do not
         // permanently refuse orbit initialization: use the player's spawn heading.
