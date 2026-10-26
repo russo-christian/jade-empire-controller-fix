@@ -155,6 +155,18 @@ static void __fastcall orbit_input(void* behaviour, void*, float horizontal, flo
     field<unsigned>(player, 0x994) = saved;
 }
 
+// With look input centred, the orbit camera update asks for the interaction
+// target at 0x4225A9, steers toward it with a +/-1 horizontal input, then calls
+// 0x421AD0, which zeroes the yaw at +0xC0. Independent orbit keeps an absolute
+// heading there, so that recenter jumps the camera and restarts the steering in
+// a loop. Report no target to this call site only; 0x461950 has many other
+// callers, and target selection, labels and interaction are unchanged.
+static void* __fastcall orbit_focus_target(void* campaign, void*, void* output) {
+    using Target = void*(__thiscall*)(void*, void*);
+    void* target = reinterpret_cast<Target>(0x461950)(campaign, output);
+    return target && exploration_player() ? nullptr : target;
+}
+
 // The independent-orbit path at 0x42111F skips collision resolution. Pass its
 // goal through the game's collision solver (0x420730) after this frame's target
 // pivot has been updated, without changing orbit input.
@@ -342,6 +354,7 @@ static Patch patches[] = {
     {0x667480, {0xe8, 0x5b, 0x04, 0x00, 0x00}, reinterpret_cast<void*>(&menu_controller)},
     {0x667561, {0xe8, 0x7a, 0x03, 0x00, 0x00}, reinterpret_cast<void*>(&menu_controller)},
     {0x422757, {0xe8, 0x44, 0xee, 0xff, 0xff}, reinterpret_cast<void*>(&orbit_input)},
+    {0x4225a9, {0xe8, 0xa2, 0xf3, 0x03, 0x00}, reinterpret_cast<void*>(&orbit_focus_target)},
     {0x42111f,
      {0x8d, 0x86, 0x00, 0x01, 0x00, 0x00},
      reinterpret_cast<void*>(&orbit_position_bridge),
