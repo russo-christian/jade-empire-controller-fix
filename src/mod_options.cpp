@@ -54,4 +54,6 @@ void load_mod_options() {
     mod_options.controller_only = ini_switch(path, L"Controls", L"ControllerOnly", true);
     mod_options.controller_prompts = ini_switch(path, L"Interface", L"ControllerPrompts", true);
     mod_options.rumble = ini_switch(path, L"Feedback", L"Rumble", true);
+    mod_options.invert_look_x = ini_switch(path, L"Controls", L"InvertLookX", false);
+    mod_options.invert_look_y = ini_switch(path, L"Controls", L"InvertLookY", false);
 }

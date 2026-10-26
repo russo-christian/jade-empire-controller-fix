@@ -404,8 +404,8 @@ static void xinput_raw(const XINPUT_GAMEPAD& pad) {
     const auto invert = [](short v) { return v == -32768 ? 32767 : -static_cast<int>(v); };
     field<int>(raw, 0) = pad.sThumbLX;
     field<int>(raw, 4) = invert(pad.sThumbLY);
-    field<int>(raw, 12) = pad.sThumbRX;
-    field<int>(raw, 16) = invert(pad.sThumbRY);
+    field<int>(raw, 12) = mod_options.invert_look_x ? invert(pad.sThumbRX) : pad.sThumbRX;
+    field<int>(raw, 16) = mod_options.invert_look_y ? pad.sThumbRY : invert(pad.sThumbRY);
     for (unsigned i = 0; i < 4; ++i)
         field<int>(raw, 32 + i * 4) = -1;
     const int x = ((pad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT) != 0) -

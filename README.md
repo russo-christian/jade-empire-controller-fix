@@ -67,12 +67,14 @@ To uninstall, remove `dinput8.dll` from your game directory.
 Edit `JadeEmpireControllerFix.ini` beside the DLL and restart the game. Note that it is 
 separate from the game's `JadeEmpire.ini`.
 
-| Section | Option | `1` (default) | `0` |
-| --- | --- | --- | --- |
-| Controls | `ControllerOnly` | Limit exploration movement/camera changes to controller input. | Apply them to keyboard/mouse as well (not extensively tested). |
-| Controls | `RightStickTargetSwitching` | Horizontal right-stick flicks switch locked combat targets (similar to modern souls likes). | Keep native right-stick camera input. |
-| Interface | `ControllerPrompts` | Show controller glyphs and English instructions. | Keep original text and numbered button labels. |
-| Feedback | `Rumble` | Enable XInput vibration. | Disable mod XInput vibration. |
+| Section | Option | Default | `1` | `0` |
+| --- | --- | --- | --- | --- |
+| Controls | `ControllerOnly` | `1` | Limit exploration movement/camera changes to controller input. | Apply them to keyboard/mouse as well (not extensively tested). |
+| Controls | `RightStickTargetSwitching` | `1` | Horizontal right-stick flicks switch locked combat targets (similar to modern souls likes). | Keep native right-stick camera input. |
+| Controls | `InvertLookX` | `0` | Invert right-stick horizontal camera look. | Normal horizontal look. |
+| Controls | `InvertLookY` | `0` | Invert right-stick vertical camera look. | Normal vertical look. |
+| Interface | `ControllerPrompts` | `1` | Show controller glyphs and English instructions. | Keep original text and numbered button labels. |
+| Feedback | `Rumble` | `1` | Enable XInput vibration. | Disable mod XInput vibration. |
 
 The `ControllerOnly` option affects exploration movement and camera, not menu input
 or target switching. 
