@@ -1,0 +1,26 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and test
+        shell: pwsh
+        run: .\tools\build.ps1
+
+      - name: Upload mod
+        uses: actions/upload-artifact@v4
+        with:
+          name: JadeEmpireControllerFix
+          path: |
+            build/dinput8.dll
+            build/JadeEmpireControllerFix.ini
+          if-no-files-found: error
