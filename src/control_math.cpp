@@ -39,3 +39,11 @@ bool plan_movement(Quaternion q, Vec3 facing, Vec3 velocity, float backward, flo
     result = {direction, {direction.x * speed, direction.y * speed, 0}, {0, 1, 0}};
     return true;
 }
+
+float camera_input_scale(float seconds) {
+    constexpr float reference = 1.0f / 60;
+    constexpr float longest = 0.1f; // Pauses and loads are not frame time.
+    if (!std::isfinite(seconds) || seconds <= 0 || seconds > longest)
+        return 1;
+    return seconds / reference;
+}

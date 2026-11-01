@@ -34,5 +34,10 @@ int main() {
     assert(!plan_movement({1, 0, 0, 0}, facing, velocity, -1, 0, result));
     assert(!plan_movement(north, facing, velocity, std::numeric_limits<float>::quiet_NaN(), 0,
                           result));
+    assert(near(camera_input_scale(1.0f / 60), 1));
+    assert(near(camera_input_scale(1.0f / 30), 2));
+    assert(near(camera_input_scale(1.0f / 120), 0.5f));
+    assert(near(camera_input_scale(0), 1));
+    assert(near(camera_input_scale(0.5f), 1));
     std::puts("controller direction, idle, diagonal, speed, and invalid-input checks passed");
 }

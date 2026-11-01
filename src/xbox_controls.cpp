@@ -84,6 +84,19 @@ static void* exploration_player(void* expected_behaviour = nullptr) {
     return player;
 }
 
+static float camera_frame_scale() {
+    static LARGE_INTEGER previous{};
+    LARGE_INTEGER frequency, now;
+    QueryPerformanceFrequency(&frequency);
+    QueryPerformanceCounter(&now);
+    const float seconds =
+        previous.QuadPart
+            ? static_cast<float>(now.QuadPart - previous.QuadPart) / frequency.QuadPart
+            : 0;
+    previous = now;
+    return camera_input_scale(seconds);
+}
+
 static void __fastcall orbit_input(void* behaviour, void*, float horizontal, float vertical) {
     void* player = exploration_player(behaviour);
     using Original = void(__thiscall*)(void*, float, float);
@@ -148,6 +161,9 @@ static void __fastcall orbit_input(void* behaviour, void*, float horizontal, flo
         horizontal = 0;
     if (!std::isfinite(vertical))
         vertical = 0;
+    const float scale = camera_frame_scale();
+    horizontal *= scale;
+    vertical *= scale;
     // Preserve the native independent orbit, including its persistent yaw.
     const unsigned saved = field<unsigned>(player, 0x994);
     field<unsigned>(player, 0x994) = 1;
