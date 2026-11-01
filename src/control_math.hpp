@@ -15,3 +15,5 @@ Vec3 camera_forward(Quaternion q);
 // Uses processed backward/right axes; retains native speed and idle facing.
 bool plan_movement(Quaternion q, Vec3 facing, Vec3 velocity, float backward, float right,
                    Movement& result);
+// Scales per-frame camera input to its size at the 60 FPS reference rate.
+float camera_input_scale(float seconds);
